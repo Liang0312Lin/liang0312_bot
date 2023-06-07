@@ -412,7 +412,7 @@ async def on_message(message):
                 await message.channel.send(f"很抱歉，{message.author.mention}目前沒有排名。")
                 
         if message.content.startswith('!指令'):
-            embed = discord.Embed(title='目前可用指令', description="!查詢\n!偷 @人 點數\n!道德值\n!我的排名")          
+            embed = discord.Embed(title='目前可用指令', description="!查詢\n!偷 @人 點數\n!道德值\n!我的排名\n!查看懸賞\n!發布懸賞\n!接取懸賞\n!完成懸賞\n!取消懸賞\n!放棄懸賞")          
             message = await message.channel.send(embed=embed)
             
         if message.content.startswith('!管理員指令'):
@@ -422,6 +422,139 @@ async def on_message(message):
         if message.content.startswith('!道德低下'):
             await message.channel.send(f"{low_morals}")
             
+    if message.channel.id == 1084715410768805961:    
+        if message.content.startswith('!查看懸賞'):  
+            await send_task_table(message.channel)
+
+        if message.content.startswith('!發布懸賞'):
+            try:
+                with open('discord/point/task.json', 'r', encoding='UTF-8') as file:
+                    task = json.load(file)
+                with open('discord/point/point.json', 'r', encoding='UTF-8') as file:
+                    points = json.load(file)
+                release_word = message.content.split()
+                release_reward = int(release_word[-1])
+                release_name = message.author.name
+                release_id = message.author.id
+                
+                if release_word[1] not in task:
+                    if points[str(message.author.id)]["points"] >= release_reward:
+                        points[str(message.author.id)]["points"] -= release_reward
+                        with open('discord/point/point.json', 'w', encoding='UTF-8') as f:
+                            json.dump(points, f, indent=2)
+                        await message.channel.send("管理員審核中。注意:懸賞名稱不能包含人名!")
+                        check = client.get_channel(1097354533337825400)#check
+                        embed = discord.Embed(title='發布懸賞', description=f"{release_word[1]} {release_reward}")
+                        embed.set_footer(text=f"發布人:{release_name}")            
+                        message = await check.send(embed=embed)
+                        await message.add_reaction("⭕")
+                        await message.add_reaction("❌")
+                    else:
+                        await message.channel.send(f"發布懸賞失敗，{message.author.mention}沒有這麼多社畜幣:sob:")
+                else:
+                    await message.channel.send(f"{release_word[1]}懸賞已經存在")
+            except:
+                await message.channel.send("輸入指令錯誤，指令格式:!發布懸賞 懸賞名稱 點數\n範例:!發布懸賞 帶我團戰上13+(分數不限) 20000")
+        
+        if message.content.startswith('!接取懸賞'):
+            try:
+                with open('discord/point/task.json', 'r', encoding='UTF-8') as file:
+                    task = json.load(file)
+                word = message.content.split()
+                if word[1] in task:
+                    if task[word[1]]["receiver"] is None:
+                        if task[word[1]]["release"] != message.author.name:
+                            task[word[1]]["receiver"] = message.author.name
+                            task[word[1]]["receiver_id"] = message.author.id
+                            task[word[1]]["task_time"] = datetime.now().timestamp()
+                            release_id = task[word[1]]["release_id"]
+                            with open('discord/point/task.json', 'w', encoding='UTF-8') as f:
+                                json.dump(task, f, indent=2)
+                            await message.channel.send(f"{message.author.mention} 成功接取懸賞：{word[1]} 72小時內需要完成任務，否則自動放棄。通知發布者<@{release_id}>\n注意:完成懸賞後請截圖給管理員來結算，並且系統會抽取20%報酬")
+                        else:
+                            await message.channel.send(f"{message.author.mention} 不能接取自己發布懸賞")
+                    else:
+                        await message.channel.send(f"{word[1]} 懸賞已被接取")
+                else:
+                    await message.channel.send(f"{word[1]} 懸賞不存在")
+            except:
+               await message.channel.send("輸入指令錯誤，指令格式:!接取懸賞 懸賞名稱\n範例:!接取懸賞 帶我團戰上13+(分數不限)")
+
+        if message.content.startswith('!完成懸賞'):
+            try:
+                with open('discord/point/task.json', 'r', encoding='UTF-8') as file:
+                    task = json.load(file)
+                release_words = message.content.split()
+                release_name = message.author.name
+                release_id = message.author.id
+                if release_words[1] in task:
+                    if task[release_words[1]]["release_id"] == message.author.id or message.author.id == 525348260399939594:
+                        if task[release_words[1]]["receiver"] is not None:
+                            await message.channel.send("管理員審核中。注意:請截圖給管理員以證明完成!\n**(有洗分嫌疑的不會通過)**")
+                            check = client.get_channel(1097354533337825400)#check
+                            embed = discord.Embed(title='完成懸賞', description=f"{release_words[1]}")
+                            embed.set_footer(text=f"發布人:{release_name}")
+                            message = await check.send(embed=embed)
+                            await message.add_reaction("🙆")
+                            await message.add_reaction("🙅")
+                        else:
+                            await message.channel.send(f"{release_words[1]} 懸賞還沒有人接取")
+                    else:
+                        await message.channel.send(f"{message.author.mention} 你不是這個懸賞的發布者")
+                else:
+                    await message.channel.send(f"{release_words[1]} 懸賞不存在")
+            except:
+                await message.channel.send("輸入指令錯誤，指令格式:!完成懸賞 懸賞名稱\n範例:!完成懸賞 帶我團戰上13+(分數不限)")
+        
+        if message.content.startswith('!取消懸賞'):
+            try:
+                with open('discord/point/task.json', 'r', encoding='UTF-8') as file:
+                    task = json.load(file)
+                with open('discord/point/point.json', 'r', encoding='UTF-8') as file:
+                    points = json.load(file)
+                word = message.content.split()
+                if word[1] in task:
+                    if task[word[1]]["release_id"] == message.author.id or message.author.id == 525348260399939594:
+                        if task[word[1]]["receiver"] is None or message.author.id == 525348260399939594:
+                            reward = int(task[word[1]]["reward"])
+                            release_id = task[word[1]]["release_id"]
+                            points[str(release_id)]["points"] += reward
+                            with open('discord/point/point.json', 'w', encoding='UTF-8') as f:
+                                json.dump(points, f, indent=2)
+                            await message.channel.send(f"<@{release_id}> 成功取消懸賞:{word[1]}，取回報酬:{reward}點社畜幣")
+                            del task[word[1]]
+                            with open('discord/point/task.json', 'w', encoding='UTF-8') as f:
+                                json.dump(task, f, indent=2)
+                        else:
+                            await message.channel.send(f"{word[1]} 懸賞已被接取，無法進行取消")
+                    else:
+                        await message.channel.send(f"{message.author.mention} 你不是這個懸賞的發布者")
+                else:
+                    await message.channel.send(f"{word[1]} 懸賞不存在")
+            except:
+                await message.channel.send("輸入指令錯誤，指令格式:!取消懸賞 懸賞名稱\n範例:!取消懸賞 帶我團戰上13+(分數不限)")
+                
+        if message.content.startswith('!放棄懸賞'):
+            try:
+                with open('discord/point/task.json', 'r', encoding='UTF-8') as file:
+                    task = json.load(file)
+                word = message.content.split()
+                if word[1] in task:
+                    if task[word[1]]["receiver_id"] == message.author.id:
+                        release_id = task[word[1]]["release_id"]
+                        receiver_id = task[word[1]]["receiver_id"]
+                        await message.channel.send(f"<@{receiver_id}> 成功放棄懸賞:{word[1]}。通知發布者<@{release_id}>")
+                        task[word[1]]["receiver"] = None
+                        task[word[1]]["receiver_id"] = None
+                        task[word[1]]["task_time"] = None
+                        with open('discord/point/task.json', 'w', encoding='UTF-8') as f:
+                            json.dump(task, f, indent=2)
+                    else:
+                        await message.channel.send(f"{message.author.mention} 你不是這個懸賞的接取者")
+                else:
+                    await message.channel.send(f"{word[1]} 懸賞不存在")
+            except:
+                await message.channel.send("輸入指令錯誤，指令格式:!放棄懸賞 懸賞名稱\n範例:!放棄懸賞 帶我團戰上13+(分數不限)")
                 
             
     if isinstance(message.channel, discord.DMChannel):       
@@ -733,7 +866,73 @@ async def on_reaction_add(reaction, user):
                 logger.info(f'{user.name} 在{question}，選擇D選項:{option_list[3]}')
         else:
             await user.send(f"你已經選擇了{selected_options[user.id]}選項，無法選擇D選項")
+            
+    if str(reaction.emoji) == "⭕" and "測試" in [role.name for role in user.roles]:
+        embed = discord.Embed(title='發布懸賞:同意', description=f"{release_word[1]} {release_reward}")
+        embed.set_footer(text=f"發布人:{release_name}\n審核人:{user.name}")
+        await reaction.message.edit(embed=embed)
+        await reaction.message.clear_reactions()
+        respond = client.get_channel(1084715410768805961)
+        with open('discord/point/task.json', 'r', encoding='UTF-8') as file:
+            task = json.load(file)
+        task[release_word[1]] = {"taskname": release_word[1],"reward": release_reward ,"release" : release_name,"release_id" : release_id,"receiver" : None,"receiver_id" : None,"task_time": None}
+        with open('discord/point/task.json', 'w', encoding='UTF-8') as f:
+            json.dump(task, f, indent=2)
+        await respond.send(f"<@{release_id}>發布懸賞成功：{release_word[1]} 報酬:{task[release_word[1]]['reward']}點社畜幣")
+        release_word = None
+        release_reward = None
+        release_name = None
+        release_id = None
 
+    if str(reaction.emoji) == "❌" and "測試" in [role.name for role in user.roles]:
+        embed = discord.Embed(title='發布懸賞:拒絕', description=f"{release_word[1]} {release_reward}")
+        embed.set_footer(text=f"發布人:{release_name}\n審核人:{user.name}")
+        await reaction.message.edit(embed=embed)
+        await reaction.message.clear_reactions()
+        respond = client.get_channel(1084715410768805961)
+        with open('discord/point/point.json', 'r', encoding='UTF-8') as file:
+            points = json.load(file)
+        points[str(release_id)]["points"] += release_reward
+        with open('discord/point/point.json', 'w', encoding='UTF-8') as f:
+            json.dump(points, f, indent=2)
+        await respond.send(f"<@{release_id}>發布懸賞失敗：{release_word[1]}")
+        release_word = None
+        release_reward = None
+        release_name = None
+        release_id = None
+
+    if str(reaction.emoji) == "🙆" and "測試" in [role.name for role in user.roles]:
+        embed = discord.Embed(title='完成懸賞:成功', description=f"{release_words[1]}")
+        embed.set_footer(text=f"發布人:{release_name}\n審核人:{user.name}")
+        await reaction.message.edit(embed=embed)
+        await reaction.message.clear_reactions()
+        respond = client.get_channel(1084715410768805961)
+        
+        with open('discord/point/task.json', 'r', encoding='UTF-8') as file:
+            task = json.load(file)
+        with open('discord/point/point.json', 'r', encoding='UTF-8') as file:
+            points = json.load(file)
+        reward = int(task[release_words[1]]["reward"])
+        receiver_id = task[release_words[1]]["receiver_id"]
+        points[str(receiver_id)]["points"] += math.ceil(reward*0.8) #抽取傭金20%
+        with open('discord/point/point.json', 'w', encoding='UTF-8') as f:
+            json.dump(points, f, indent=2)
+        await respond.send(f"<@{receiver_id}> 恭喜完成懸賞:{release_words[1]}，獲得報酬:{math.ceil(reward*0.8)}點社畜幣(系統抽成20%)")
+        del task[release_words[1]]
+        with open('discord/point/task.json', 'w', encoding='UTF-8') as f:
+            json.dump(task, f, indent=2)
+            
+        release_words = None
+    
+    if str(reaction.emoji) == "🙅" and "測試" in [role.name for role in user.roles]:
+        embed = discord.Embed(title='完成懸賞:失敗', description=f"{release_words[1]}")
+        embed.set_footer(text=f"發布人:{release_name}\n審核人:{user.name}")
+        await reaction.message.edit(embed=embed)
+        await reaction.message.clear_reactions()
+        respond = client.get_channel(1084715410768805961)
+        await respond.send(f"請私訊管理員{user.mention}詢問失敗原因(洗分的就不用來問了)")
+        
+        release_words = None
             
 # 定義清除表情的函數
 async def clear_reactions(message):
@@ -828,6 +1027,52 @@ async def send_latest_log():
                 await channel.send(line.strip())
             os.environ["DISCORD_LOG_LAST_POSITION"] = str(len(log_lines))
 
+async def send_task_table(channel):
+    global examine_message_ids
+    global examine_message_ids1
+    global task_elapsed
+    with open('discord/point/task.json', 'r', encoding='UTF-8') as file:
+        task = json.load(file)
+    task_list = sorted(task.items())
+    num_task = math.ceil(len(task_list) / 25)
+    for a in range(num_task):
+        table = "**懸賞列表**\n"
+        for b, (taskname, taskinfo) in enumerate(task_list[a * 25:(a + 1) * 25], start=a * 25 + 1):
+            if b > len(task_list):
+                break
+            taskname = taskinfo['taskname']
+            reward = taskinfo['reward']
+            release = taskinfo['release']
+            release_id = taskinfo['release_id']
+            receiver = taskinfo['receiver']
+            receiver_id = taskinfo['receiver_id']
+            if taskinfo['task_time'] != None:
+                task_time = datetime.fromtimestamp(taskinfo['task_time'])
+                task_now = datetime.now()
+                task_elapsed_time = task_now - task_time
+                task_elapsed_seconds = task_elapsed_time.total_seconds()
+                task_elapsed = str(timedelta(seconds=task_elapsed_seconds)).split('.')[0]
+                if task_elapsed_seconds > 259200:
+                    await channel.send(f"<@{receiver_id}> 懸賞過期放棄懸賞:{taskname}。通知發布者<@{release_id}>")
+                    taskinfo["receiver"] = None
+                    taskinfo["receiver_id"] = None
+                    taskinfo["task_time"] = None
+                    with open('discord/point/task.json', 'w', encoding='UTF-8') as f:
+                        json.dump(task, f, indent=2)
+            else:
+                task_elapsed = None
+            table += f"**{b}.**懸賞名稱:{taskname}\t酬勞:{reward}點社畜幣\t發布人:{release}\t接取人:{receiver}\t已使用時間:{task_elapsed}\n"
+        message = await channel.send(table)
+        examine_message_ids.append(message.id)
+        if len(examine_message_ids1) > 0:
+            for message_id in examine_message_ids1:
+                message = await channel.fetch_message(message_id)
+                await message.delete()
+            examine_message_ids1 = []
+    examine_message_ids1 += examine_message_ids
+    examine_message_ids = []
+    if num_task == 0 :
+        await message.channel.send("現在沒有任何懸賞")
 
 def shutdown_handler(signum, frame):
     logger.info('機器人快睡著囉')
