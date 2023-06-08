@@ -428,6 +428,11 @@ async def createpoll_command(interaction,result:app_commands.Choice[str]):
             user_points = points[user_id]['points']
             await user.send(f'恭喜你獲得{int(betting * magnification)}點，目前社畜幣為{user_points}')
             logger.info(f'{user.name} 在{question}，選擇A選項:{option_list[0]}，成功獲得{int(betting * magnification)}點社畜幣')
+        for user_id, info in option["option_B"]["betting"].items():
+            betting = info["betting"]
+            user = await client.fetch_user(user_id)
+            await user.send(f'很遺憾你在本次投票中失敗，損失{int(betting)}點社畜幣')
+            logger.info(f'{user.name} 在{question}，選擇B選項:{option_list[1]}，損失{int(betting)}點社畜幣')
         await interaction.response.send_message(f"恭喜選項A {option_list[0]} 獲勝")
         selected_options={}
         option["option_A"]["total"] = 0
@@ -460,6 +465,11 @@ async def createpoll_command(interaction,result:app_commands.Choice[str]):
             user_points = points[user_id]['points']
             await user.send(f'恭喜你獲得{int(betting * magnification)}點，目前社畜幣為{user_points}')
             logger.info(f'{user.name} 在{question}，選擇B選項:{option_list[1]}，成功獲得{int(betting * magnification)}點社畜幣')
+        for user_id, info in option["option_A"]["betting"].items():
+            betting = info["betting"]
+            user = await client.fetch_user(user_id)
+            await user.send(f'很遺憾你在本次投票中失敗，損失{int(betting)}點社畜幣')
+            logger.info(f'{user.name} 在{question}，選擇A選項:{option_list[0]}，損失{int(betting)}點社畜幣')
         await interaction.response.send_message(f"恭喜選項B {option_list[1]} 獲勝")
         selected_options={}
         option["option_A"]["total"] = 0
