@@ -1099,56 +1099,58 @@ async def on_reaction_add(reaction, user):
                 logger.info(f'{user.name} 在{question}，選擇B選項:{option_list[1]}')
         else:
             await user.send(f"你已經選擇了{selected_options[user.id]}選項，無法選擇B選項")
+    if release_id != None:
+        if str(reaction.emoji) == "⭕" and user.id == release_id:
+            embed = discord.Embed(
+                title='發布懸賞:同意', description=f"{release_word} {release_reward}")
+            embed.set_footer(text=f"請發布人:{release_name}自行按表情確認喔\n審核人:{user.name}")
+            await reaction.message.edit(embed=embed)
+            await reaction.message.clear_reactions()
+            respond = client.get_channel(1098157508293562388)
+            with open('task.json', 'r', encoding='UTF-8') as file:
+                task = json.load(file)
+            task[release_word] = {
+                "taskname": release_word,
+                "reward": release_reward,
+                "release": release_name,
+                "release_id": release_id,
+                "receiver": None,
+                "receiver_id": None,
+                "task_time": None,
+                "start_time": None
+            }
+            task[release_word]["start_time"] = datetime.now().timestamp()
+            with open('task.json', 'w', encoding='UTF-8') as f:
+                json.dump(task, f, indent=2)
+            await respond.send(
+                f"<@{release_id}>發布懸賞成功：{release_word} 報酬:{task[release_word]['reward']}點社畜幣\n(14天內沒完成會自動取消懸賞)"
+            )
+            await respond.send(f"提醒 <@&1108401153315704842> 有新懸賞發布")
 
-    if str(reaction.emoji) == "⭕" and user.id == release_id:
-        embed = discord.Embed(
-            title='發布懸賞:同意', description=f"{release_word} {release_reward}")
-        embed.set_footer(text=f"請發布人:{release_name}自行按表情確認喔\n審核人:{user.name}")
-        await reaction.message.edit(embed=embed)
-        await reaction.message.clear_reactions()
-        respond = client.get_channel(1098157508293562388)
-        with open('task.json', 'r', encoding='UTF-8') as file:
-            task = json.load(file)
-        task[release_word] = {
-            "taskname": release_word,
-            "reward": release_reward,
-            "release": release_name,
-            "release_id": release_id,
-            "receiver": None,
-            "receiver_id": None,
-            "task_time": None,
-            "start_time": None
-        }
-        task[release_word]["start_time"] = datetime.now().timestamp()
-        with open('task.json', 'w', encoding='UTF-8') as f:
-            json.dump(task, f, indent=2)
-        await respond.send(
-            f"<@{release_id}>發布懸賞成功：{release_word} 報酬:{task[release_word]['reward']}點社畜幣\n(14天內沒完成會自動取消懸賞)"
-        )
-        await respond.send(f"提醒 <@&1108401153315704842> 有新懸賞發布")
+            release_word = None
+            release_reward = None
+            release_name = None
+            release_id = None
 
-        release_word = None
-        release_reward = None
-        release_name = None
-        release_id = None
-
-    if str(reaction.emoji) == "❌" and user.id == release_id:
-        embed = discord.Embed(
-            title='發布懸賞:拒絕', description=f"{release_word} {release_reward}")
-        embed.set_footer(text=f"請發布人:{release_name}自行按表情確認喔\n審核人:{user.name}")
-        await reaction.message.edit(embed=embed)
-        await reaction.message.clear_reactions()
-        respond = client.get_channel(1098157508293562388)
-        with open('point.json', 'r', encoding='UTF-8') as file:
-            points = json.load(file)
-        points[str(release_id)]["points"] += release_reward
-        with open('point.json', 'w', encoding='UTF-8') as f:
-            json.dump(points, f, indent=2)
-        await respond.send(f"<@{release_id}>發布懸賞失敗：{release_word}")
-        release_word = None
-        release_reward = None
-        release_name = None
-        release_id = None
+        if str(reaction.emoji) == "❌" and user.id == release_id:
+            embed = discord.Embed(
+                title='發布懸賞:拒絕', description=f"{release_word} {release_reward}")
+            embed.set_footer(text=f"請發布人:{release_name}自行按表情確認喔\n審核人:{user.name}")
+            await reaction.message.edit(embed=embed)
+            await reaction.message.clear_reactions()
+            respond = client.get_channel(1098157508293562388)
+            with open('point.json', 'r', encoding='UTF-8') as file:
+                points = json.load(file)
+            points[str(release_id)]["points"] += release_reward
+            with open('point.json', 'w', encoding='UTF-8') as f:
+                json.dump(points, f, indent=2)
+            await respond.send(f"<@{release_id}>發布懸賞失敗：{release_word}")
+            release_word = None
+            release_reward = None
+            release_name = None
+            release_id = None
+    else:
+        pass
 
     if str(reaction.emoji) == "🙆" and "畜長" in [
             role.name for role in user.roles
