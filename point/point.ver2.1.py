@@ -175,6 +175,8 @@ async def steal_command(interaction,user:discord.Member,amount:int):
     amount = amount
     user_id = interaction.user.id
     user_name = interaction.user.nick
+    if user_name is None:
+        user_name = interaction.user.name
     members_id = members.id
     if str(members_id) in points:
         if amount > 0:
