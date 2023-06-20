@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 import logging
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
-import keep_alive
+#import keep_alive
 import requests
 import re
 from discord import AppCommandOptionType, app_commands
@@ -88,7 +88,7 @@ voice_channel = my_voice_channel
 
 @tree.command(name = "query_coin", description = "查詢自己的社畜幣", guild=discord.Object(id=749297337712508938))
 async def querycoin_command(interaction):
-    logger.info(f"{interaction.user.name} 輸入指令:/query_coin")
+    logger.info(f"{interaction.user.nick} 輸入指令:/query_coin")
     global voice_channel
     global start_time
     global tmp
@@ -111,7 +111,7 @@ async def querycoin_command(interaction):
             else:
                 elapsed_seconds = 0
         points[str(user_id)]['points'] += tmp
-        logger.info(f"{interaction.user.name} 獲得{tmp}點社畜幣")
+        logger.info(f"{interaction.user.nick} 獲得{tmp}點社畜幣")
             
         guild_id = 749297337712508938  # 輸入伺服器 ID
         guild = client.get_guild(guild_id)
@@ -131,7 +131,7 @@ async def querycoin_command(interaction):
 
 @tree.command(name = "myrank", description = "查詢自己的社畜幣排名", guild=discord.Object(id=749297337712508938))
 async def myrank_command(interaction):
-    logger.info(f"{interaction.user.name} 輸入指令:/myrank")
+    logger.info(f"{interaction.user.nick} 輸入指令:/myrank")
     channel_id = 1091377260159848621 # 限定的頻道 ID
     if interaction.channel_id != channel_id:
         await interaction.response.send_message(f"你只能在<#1091377260159848621>中查詢自己的社畜幣排名。", ephemeral=True)
@@ -163,7 +163,7 @@ async def steal_command(interaction,user:discord.Member,amount:int):
     :param amount: 輸入偷竊金額(整數)
     :type amount: int
     """
-    logger.info(f"{interaction.user.name} 輸入指令:/steal 選擇偷竊的對象:{user.mention} 輸入偷竊金額:{amount}")
+    logger.info(f"{interaction.user.nick} 輸入指令:/steal 選擇偷竊的對象:{user.mention} 輸入偷竊金額:{amount}")
     channel_id = 1091377260159848621 # 限定的頻道 ID
     if interaction.channel_id != channel_id:
         await interaction.response.send_message(f"你只能在<#1091377260159848621>中使用偷竊。", ephemeral=True)
@@ -174,7 +174,7 @@ async def steal_command(interaction,user:discord.Member,amount:int):
     members = user
     amount = amount
     user_id = interaction.user.id
-    user_name = interaction.user.name
+    user_name = interaction.user.nick
     members_id = members.id
     if str(members_id) in points:
         if amount > 0:
@@ -232,7 +232,7 @@ async def steal_command(interaction,user:discord.Member,amount:int):
 
 @tree.command(name = "moral_value", description = "道德值", guild=discord.Object(id=749297337712508938))
 async def moralvalue_command(interaction):
-    logger.info(f"{interaction.user.name} 輸入指令:/moral_value")
+    logger.info(f"{interaction.user.nick} 輸入指令:/moral_value")
     channel_id = 1091377260159848621 # 限定的頻道 ID
     if interaction.channel_id != channel_id:
         await interaction.response.send_message(f"你只能在<#1091377260159848621>中查詢道德值。", ephemeral=True)
@@ -246,7 +246,7 @@ async def moralvalue_command(interaction):
 
 @tree.command(name = "bounty_hunter", description = "賞金獵人", guild=discord.Object(id=749297337712508938))
 async def bountyhunter_command(interaction):
-    logger.info(f"{interaction.user.name} 輸入指令:/bounty_hunter")
+    logger.info(f"{interaction.user.nick} 輸入指令:/bounty_hunter")
     channel_id = 1091377260159848621 # 限定的頻道 ID
     if interaction.channel_id != channel_id:
         await interaction.response.send_message(f"你只能在<#1091377260159848621>中查詢賞金獵人。", ephemeral=True)
@@ -261,7 +261,7 @@ async def bountyhunter_command(interaction):
 
 @tree.command(name = "ranklist", description = "查詢所有人社畜幣排名", guild=discord.Object(id=749297337712508938))
 async def ranklist_command(interaction):
-    logger.info(f"{interaction.user.name} 輸入指令:/ranklist_command")
+    logger.info(f"{interaction.user.nick} 輸入指令:/ranklist_command")
     channel_id = 1109824925105139752 # 限定的頻道 ID
     member = interaction.user
     if interaction.channel_id != channel_id:
@@ -301,7 +301,7 @@ async def ranklist_command(interaction):
 
 @tree.command(name = "taskranklist", description = "查詢所有人懸賞排名", guild=discord.Object(id=749297337712508938))
 async def taskranklist_command(interaction):
-    logger.info(f"{interaction.user.name} 輸入指令:/taskranklist_command")
+    logger.info(f"{interaction.user.nick} 輸入指令:/taskranklist_command")
     channel_id = 1109824925105139752 # 限定的頻道 ID
     member = interaction.user
     if interaction.channel_id != channel_id:
@@ -354,7 +354,7 @@ async def createpoll_command(interaction,title:str,option_a:str,option_b:str):
     :param option_b: 選項B
     :type option_b: str
     """
-    logger.info(f"{interaction.user.name} 輸入指令:/create_poll 投票標題:{title} 選項A:{option_a} 選項B:{option_b}")
+    logger.info(f"{interaction.user.nick} 輸入指令:/create_poll 投票標題:{title} 選項A:{option_a} 選項B:{option_b}")
     channel_id = 1091377309753282732 # 限定的頻道 ID
     member = interaction.user
     if interaction.channel_id != channel_id:
@@ -392,7 +392,7 @@ async def createpoll_command(interaction,result:app_commands.Choice[str]):
     :param result: 選擇結果
     :type result: str
     """
-    logger.info(f"{interaction.user.name} 輸入指令:/poll_result 選擇結果:{result.name}")
+    logger.info(f"{interaction.user.nick} 輸入指令:/poll_result 選擇結果:{result.name}")
     channel_id = 1091377309753282732 # 限定的頻道 ID
     member = interaction.user
     if interaction.channel_id != channel_id:
@@ -427,12 +427,12 @@ async def createpoll_command(interaction,result:app_commands.Choice[str]):
                 points = json.load(file)
             user_points = points[user_id]['points']
             await user.send(f'恭喜你獲得{int(betting * magnification)}點，目前社畜幣為{user_points}')
-            logger.info(f'{user.name} 在{question}，選擇A選項:{option_list[0]}，成功獲得{int(betting * magnification)}點社畜幣')
+            logger.info(f'{user.nick} 在{question}，選擇A選項:{option_list[0]}，成功獲得{int(betting * magnification)}點社畜幣')
         for user_id, info in option["option_B"]["betting"].items():
             betting = info["betting"]
             user = await client.fetch_user(user_id)
             await user.send(f'很遺憾你在本次投票中失敗，損失{int(betting)}點社畜幣')
-            logger.info(f'{user.name} 在{question}，選擇B選項:{option_list[1]}，損失{int(betting)}點社畜幣')
+            logger.info(f'{user.nick} 在{question}，選擇B選項:{option_list[1]}，損失{int(betting)}點社畜幣')
         await interaction.response.send_message(f"恭喜選項A {option_list[0]} 獲勝")
         selected_options={}
         option["option_A"]["total"] = 0
@@ -464,12 +464,12 @@ async def createpoll_command(interaction,result:app_commands.Choice[str]):
                 points = json.load(file)
             user_points = points[user_id]['points']
             await user.send(f'恭喜你獲得{int(betting * magnification)}點，目前社畜幣為{user_points}')
-            logger.info(f'{user.name} 在{question}，選擇B選項:{option_list[1]}，成功獲得{int(betting * magnification)}點社畜幣')
+            logger.info(f'{user.nick} 在{question}，選擇B選項:{option_list[1]}，成功獲得{int(betting * magnification)}點社畜幣')
         for user_id, info in option["option_A"]["betting"].items():
             betting = info["betting"]
             user = await client.fetch_user(user_id)
             await user.send(f'很遺憾你在本次投票中失敗，損失{int(betting)}點社畜幣')
-            logger.info(f'{user.name} 在{question}，選擇A選項:{option_list[0]}，損失{int(betting)}點社畜幣')
+            logger.info(f'{user.nick} 在{question}，選擇A選項:{option_list[0]}，損失{int(betting)}點社畜幣')
         await interaction.response.send_message(f"恭喜選項B {option_list[1]} 獲勝")
         selected_options={}
         option["option_A"]["total"] = 0
@@ -492,7 +492,7 @@ async def createpoll_command(interaction,result:app_commands.Choice[str]):
 
 @tree.command(name = "update_png", description = "刷新投票圖片", guild=discord.Object(id=749297337712508938))
 async def ranklist_command(interaction):
-    logger.info(f"{interaction.user.name} 輸入指令:/update_png")
+    logger.info(f"{interaction.user.nick} 輸入指令:/update_png")
     channel_id = 1091377309753282732 # 限定的頻道 ID
     member = interaction.user
     if interaction.channel_id != channel_id:
@@ -510,7 +510,7 @@ async def ranklist_command(interaction):
  
 @tree.command(name = "stopupdate_png", description = "停止刷新投票圖片", guild=discord.Object(id=749297337712508938))
 async def ranklist_command(interaction):
-    logger.info(f"{interaction.user.name} 輸入指令:/stopupdate_png")
+    logger.info(f"{interaction.user.nick} 輸入指令:/stopupdate_png")
     channel_id = 1091377309753282732 # 限定的頻道 ID
     member = interaction.user
     if interaction.channel_id != channel_id:
@@ -525,7 +525,7 @@ async def ranklist_command(interaction):
 
 @tree.command(name = "query_bounty", description = "查詢現有的懸賞", guild=discord.Object(id=749297337712508938))
 async def querybounty_command(interaction):
-    logger.info(f"{interaction.user.name} 輸入指令:/query_bounty")
+    logger.info(f"{interaction.user.nick} 輸入指令:/query_bounty")
     channel_id = 1098157508293562388 # 限定的頻道 ID
     if interaction.channel_id != channel_id:
         await interaction.response.send_message(f"你只能在<#1098157508293562388>中查詢現有的懸賞。", ephemeral=True)
@@ -581,9 +581,9 @@ async def postbounty_command(interaction,type:app_commands.Choice[str],other:Opt
     :type games: int
     """
     if other:
-        logger.info(f"{interaction.user.name} 輸入指令:/post_bounty 懸賞類型:{type.name} 戰術內容描述:{other} 目前分數:{score.name} 接單人分數需求:{limit_score.name} 場數:{games}場")
+        logger.info(f"{interaction.user.nick} 輸入指令:/post_bounty 懸賞類型:{type.name} 戰術內容描述:{other} 目前分數:{score.name} 接單人分數需求:{limit_score.name} 場數:{games}場")
     else:
-        logger.info(f"{interaction.user.name} 輸入指令:/post_bounty 懸賞類型:{type.name} 目前分數:{score.name} 接單人分數需求:{limit_score.name} 場數:{games}場")
+        logger.info(f"{interaction.user.nick} 輸入指令:/post_bounty 懸賞類型:{type.name} 目前分數:{score.name} 接單人分數需求:{limit_score.name} 場數:{games}場")
     channel_id = 1098157508293562388 # 限定的頻道 ID
     if interaction.channel_id != channel_id:
         await interaction.response.send_message(f"你只能在<#1098157508293562388>中發布懸賞。", ephemeral=True)
@@ -596,7 +596,7 @@ async def postbounty_command(interaction,type:app_commands.Choice[str],other:Opt
     global release_id
     global release_name
     release_id = interaction.user.id
-    release_name = interaction.user.name
+    release_name = interaction.user.nick
     release_reward = math.ceil(float(type.value)*float(score.value)*float(limit_score.value)*games)
     
     with open('task.json', 'r', encoding='UTF-8') as file:
@@ -632,13 +632,13 @@ async def acceptbounty_command(interaction,title:str):
     :param title: 懸賞名稱
     :type title: str
     """
-    logger.info(f"{interaction.user.name} 輸入指令:/accept_bounty 懸賞名稱:{title}")
+    logger.info(f"{interaction.user.nick} 輸入指令:/accept_bounty 懸賞名稱:{title}")
     channel_id = 1098157508293562388 # 限定的頻道 ID
     if interaction.channel_id != channel_id:
         await interaction.response.send_message(f"你只能在<#1098157508293562388>中接取懸賞。", ephemeral=True)
         return
     user_id = interaction.user.id
-    user_name = interaction.user.name
+    user_name = interaction.user.nick
     with open('task.json', 'r', encoding='UTF-8') as file:
         task = json.load(file)
     word = title
@@ -667,7 +667,7 @@ async def finishbounty_command(interaction,title:str):
     :param title: 懸賞名稱
     :type title: str
     """
-    logger.info(f"{interaction.user.name} 輸入指令:/finish_bounty 懸賞名稱:{title}")
+    logger.info(f"{interaction.user.nick} 輸入指令:/finish_bounty 懸賞名稱:{title}")
     channel_id = 1098157508293562388 # 限定的頻道 ID
     if interaction.channel_id != channel_id:
         await interaction.response.send_message(f"你只能在<#1098157508293562388>中完成懸賞。", ephemeral=True)
@@ -678,7 +678,7 @@ async def finishbounty_command(interaction,title:str):
     with open('task.json', 'r', encoding='UTF-8') as file:
         task = json.load(file)
     release_words = title
-    release_name = interaction.user.name
+    release_name = interaction.user.nick
     release_id = interaction.user.id
     if release_words in task:
         if task[release_words]["release_id"] == interaction.user.id or interaction.user.id == 525348260399939594:
@@ -705,7 +705,7 @@ async def cancelbounty_command(interaction,title:str):
     :param title: 懸賞名稱
     :type title: str
     """
-    logger.info(f"{interaction.user.name} 輸入指令:/cancel_bounty 懸賞名稱:{title}")
+    logger.info(f"{interaction.user.nick} 輸入指令:/cancel_bounty 懸賞名稱:{title}")
     channel_id = 1098157508293562388 # 限定的頻道 ID
     if interaction.channel_id != channel_id:
         await interaction.response.send_message(f"你只能在<#1098157508293562388>中取消懸賞。", ephemeral=True)
@@ -743,7 +743,7 @@ async def abandonmentbounty_command(interaction,title:str):
     :param title: 懸賞名稱
     :type title: str
     """
-    logger.info(f"{interaction.user.name} 輸入指令:/abandonment_bounty 懸賞名稱:{title}")
+    logger.info(f"{interaction.user.nick} 輸入指令:/abandonment_bounty 懸賞名稱:{title}")
     channel_id = 1098157508293562388 # 限定的頻道 ID
     if interaction.channel_id != channel_id:
         await interaction.response.send_message(f"你只能在<#1098157508293562388>中放棄懸賞。", ephemeral=True)
@@ -776,11 +776,14 @@ async def on_voice_state_update(member, before, after):
     global target_channel_id
     global target_channel
     global low_morals
+    nickname = member.nick
+    if nickname is None:
+        nickname = member.name
     with open('point.json', 'r', encoding='UTF-8') as file:
         points = json.load(file)
 
     if before.channel is not None:
-        logger.info(f"{member.name} 離開語音頻道 {before.channel.name}")
+        logger.info(f"{nickname} 離開語音頻道 {before.channel.name}")
         if after.channel is not None and after.channel.id in voice_channel:
             if points[str(member.id)]["start_time"] != None:
                 start_time = datetime.fromtimestamp(points[str(
@@ -795,7 +798,7 @@ async def on_voice_state_update(member, before, after):
                             target_channel_id)
                         await target_channel.send(
                             f"{member.mention}一番靜坐後，頓時感到心靈祥和，彷彿內心的罪惡感都消除了")
-                        logger.info(f"{member.name} 道德值恢復")
+                        logger.info(f"{nickname} 道德值恢復")
                         if member.id in low_morals:
                             low_morals.remove(member.id)
                     if elapsed_seconds >= 60:
@@ -804,7 +807,7 @@ async def on_voice_state_update(member, before, after):
                     else:
                         elapsed_seconds = 0
                 points[str(member.id)]['points'] += tmp
-                logger.info(f"{member.name} 獲得{tmp}點社畜幣")
+                logger.info(f"{nickname} 獲得{tmp}點社畜幣")
                 points[str(member.id)]["start_time"] = None
                 start_time = None
                 tmp = 0
@@ -829,7 +832,7 @@ async def on_voice_state_update(member, before, after):
                             target_channel_id)
                         await target_channel.send(
                             f"{member.mention}一番靜坐後，頓時感到心靈祥和，彷彿內心的罪惡感都消除了")
-                        logger.info(f"{member.name} 道德值恢復")
+                        logger.info(f"{nickname} 道德值恢復")
                         if member.id in low_morals:
                             low_morals.remove(member.id)
                     if elapsed_seconds >= 60:
@@ -838,7 +841,7 @@ async def on_voice_state_update(member, before, after):
                     else:
                         elapsed_seconds = 0
                 points[str(member.id)]['points'] += tmp
-                logger.info(f"{member.name} 獲得{tmp}點社畜幣")
+                logger.info(f"{nickname} 獲得{tmp}點社畜幣")
                 points[str(member.id)]["start_time"] = None
                 start_time = None
                 tmp = 0
@@ -849,12 +852,12 @@ async def on_voice_state_update(member, before, after):
 
     if after.channel is not None:
         if str(member.id) in points:
-            if points[str(member.id)]["name"] != member.name:
-                points[str(member.id)]["name"] = member.name
+            if points[str(member.id)]["name"] != nickname:
+                points[str(member.id)]["name"] = nickname
                 with open('point.json', 'w', encoding='UTF-8') as f:
                     json.dump(points, f, indent=2)
-                logger.info(f"{member.id} 變更使用者名稱 {member.name}")
-        logger.info(f"{member.name} 進入語音頻道 {after.channel.name}")
+                logger.info(f"{member.id} 變更使用者暱稱 {nickname}")
+        logger.info(f"{nickname} 進入語音頻道 {after.channel.name}")
         if after.channel is not None and after.channel.id in voice_channel:
             member_id[member.id] = member.id
             if str(member.id) not in points:
@@ -863,14 +866,14 @@ async def on_voice_state_update(member, before, after):
                 else:
                     if str(member.id) not in points:
                         points[member.id] = {
-                            "name": member.name,
+                            "name": nickname,
                             "points": 300,
                             "start_time": None
                         }
                         with open('point.json', 'w', encoding='UTF-8') as f:
                             json.dump(points, f, indent=2)
                     member_list.append(member_id[member.id])
-                    logger.info(f'新增成員 {member.name} 第一次進入語音頻道')
+                    logger.info(f'新增成員 {nickname} 第一次進入語音頻道')
             else:
                 if points[str(member.id)]["start_time"] != None:
                     start_time = datetime.fromtimestamp(points[str(
@@ -885,7 +888,7 @@ async def on_voice_state_update(member, before, after):
                         else:
                             elapsed_seconds = 0
                     points[str(member.id)]['points'] += tmp
-                    logger.info(f"{member.name} 獲得{tmp}點社畜幣")
+                    logger.info(f"{nickname} 獲得{tmp}點社畜幣")
                     points[str(member.id)]["start_time"] = None
                     start_time = None
                     tmp = 0
@@ -910,7 +913,7 @@ async def on_voice_state_update(member, before, after):
                     else:
                         elapsed_seconds = 0
                 points[str(member.id)]['points'] += tmp
-                logger.info(f"{member.name} 獲得{tmp}點社畜幣")
+                logger.info(f"{nickname} 獲得{tmp}點社畜幣")
                 points[str(member.id)]["start_time"] = None
                 start_time = None
                 tmp = 0
@@ -1084,7 +1087,7 @@ async def on_reaction_add(reaction, user):
                 user_points = points[str(user.id)]['points']
                 await user.send(f"{question}，選擇A選項 {option_list[0]}")
                 await user.send(f"請輸入下注金額，目前有社畜幣{user_points}點")
-                logger.info(f'{user.name} 在{question}，選擇A選項:{option_list[0]}')
+                logger.info(f'{user.nick} 在{question}，選擇A選項:{option_list[0]}')
         else:
             await user.send(f"你已經選擇了{selected_options[user.id]}選項，無法選擇A選項")
 
@@ -1096,14 +1099,14 @@ async def on_reaction_add(reaction, user):
                 user_points = points[str(user.id)]['points']
                 await user.send(f"{question}，選擇B選項 {option_list[1]}")
                 await user.send(f"請輸入下注金額，目前有社畜幣{user_points}點")
-                logger.info(f'{user.name} 在{question}，選擇B選項:{option_list[1]}')
+                logger.info(f'{user.nick} 在{question}，選擇B選項:{option_list[1]}')
         else:
             await user.send(f"你已經選擇了{selected_options[user.id]}選項，無法選擇B選項")
     if release_id != None:
         if str(reaction.emoji) == "⭕" and user.id == release_id:
             embed = discord.Embed(
                 title='發布懸賞:同意', description=f"{release_word} {release_reward}")
-            embed.set_footer(text=f"請發布人:{release_name}自行按表情確認喔\n審核人:{user.name}")
+            embed.set_footer(text=f"請發布人:{release_name}自行按表情確認喔\n審核人:{user.nick}")
             await reaction.message.edit(embed=embed)
             await reaction.message.clear_reactions()
             respond = client.get_channel(1098157508293562388)
@@ -1135,7 +1138,7 @@ async def on_reaction_add(reaction, user):
         if str(reaction.emoji) == "❌" and user.id == release_id:
             embed = discord.Embed(
                 title='發布懸賞:拒絕', description=f"{release_word} {release_reward}")
-            embed.set_footer(text=f"請發布人:{release_name}自行按表情確認喔\n審核人:{user.name}")
+            embed.set_footer(text=f"請發布人:{release_name}自行按表情確認喔\n審核人:{user.nick}")
             await reaction.message.edit(embed=embed)
             await reaction.message.clear_reactions()
             respond = client.get_channel(1098157508293562388)
@@ -1157,7 +1160,7 @@ async def on_reaction_add(reaction, user):
     ]:
         embed = discord.Embed(title='完成懸賞:成功',
                               description=f"{release_words}")
-        embed.set_footer(text=f"發布人:{release_name}\n審核人:{user.name}")
+        embed.set_footer(text=f"發布人:{release_name}\n審核人:{user.nick}")
         await reaction.message.edit(embed=embed)
         await reaction.message.clear_reactions()
         respond = client.get_channel(1098157508293562388)
@@ -1222,7 +1225,7 @@ async def on_reaction_add(reaction, user):
     ]:
         embed = discord.Embed(title='完成懸賞:失敗',
                               description=f"{release_words}")
-        embed.set_footer(text=f"發布人:{release_name}\n審核人:{user.name}")
+        embed.set_footer(text=f"發布人:{release_name}\n審核人:{user.nick}")
         await reaction.message.edit(embed=embed)
         await reaction.message.clear_reactions()
         respond = client.get_channel(1098157508293562388)
@@ -1420,7 +1423,7 @@ signal.signal(signal.SIGINT, shutdown_handler)
 signal.signal(signal.SIGTERM, shutdown_handler)
 
 my_token = os.environ['token']
-keep_alive.keep_alive()
+#keep_alive.keep_alive()
 try:
     client.run(my_token)
 except:
