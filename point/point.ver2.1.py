@@ -1,6 +1,5 @@
-#新增賞金獵人懸賞排行指令
-#修改發布懸賞會通知身分組
-#修改完成懸賞獲得報酬機制
+#新增懸賞編號
+
 import os
 import asyncio
 import json
@@ -1114,7 +1113,10 @@ async def on_reaction_add(reaction, user):
             respond = client.get_channel(1098157508293562388)
             with open('task.json', 'r', encoding='UTF-8') as file:
                 task = json.load(file)
-            task[release_word] = {
+            with open('tasknum.txt', "r") as num:
+                tasknum = int(num.read())
+                formatted_tasknum = str(tasknum).zfill(5)
+            task[formatted_tasknum] = {
                 "taskname": release_word,
                 "reward": release_reward,
                 "release": release_name,
@@ -1122,16 +1124,20 @@ async def on_reaction_add(reaction, user):
                 "receiver": None,
                 "receiver_id": None,
                 "task_time": None,
-                "start_time": None
+                "start_time": None,
+                "tasknum":formatted_tasknum
             }
-            task[release_word]["start_time"] = datetime.now().timestamp()
+            task[formatted_tasknum]["start_time"] = datetime.now().timestamp()
             with open('task.json', 'w', encoding='UTF-8') as f:
                 json.dump(task, f, indent=2)
             await respond.send(
-                f"<@{release_id}>發布懸賞成功：{release_word} 報酬:{task[release_word]['reward']}點社畜幣\n(14天內沒完成會自動取消懸賞)"
+                f"<@{release_id}>發布懸賞成功：{release_word} 報酬:{task[formatted_tasknum]['reward']}點社畜幣\n(14天內沒完成會自動取消懸賞)"
             )
             await respond.send(f"提醒 <@&1108401153315704842> 有新懸賞發布")
-
+            new_tasknum = tasknum + 1
+            formatted_num = str(new_tasknum).zfill(5)
+            with open('tasknum.txt', 'w') as num1:
+                num1.write(formatted_num)
             release_word = None
             release_reward = None
             release_name = None
@@ -1358,6 +1364,7 @@ async def send_task_table(channel):
                                        start=a * 25 + 1):
             if b > len(task_list):
                 break
+            tasknum = taskinfo['tasknum']
             taskname = taskinfo['taskname']
             reward = taskinfo['reward']
             release = taskinfo['release']
@@ -1382,7 +1389,7 @@ async def send_task_table(channel):
                         json.dump(task, f, indent=2)
             else:
                 task_elapsed = None
-            table += f"**{b}.**懸賞名稱:{taskname}\n酬勞:{reward}點社畜幣\t發布人:{release}\t接取人:{receiver}\t已使用時間:{task_elapsed}\n---------------\n"
+            table += f"**{b}.**懸賞編號:{tasknum}\n懸賞名稱:{taskname}\t酬勞:{reward}點社畜幣\t發布人:{release}\t接取人:{receiver}\t已使用時間:{task_elapsed}\n---------------\n"
         message = await channel.send(table)
         examine_message_ids.append(message.id)
         if len(examine_message_ids1) > 0:
