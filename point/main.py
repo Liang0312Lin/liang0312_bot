@@ -370,10 +370,20 @@ async def createpoll_command(interaction,title:str,option_a:str,option_b:str):
     bet = True
     question = title
     option_list = [option_a,option_b]
+    
+    with open('option.json', 'r', encoding='UTF-8') as file:
+        option = json.load(file)
+    with open('pollnum.txt', "r") as poll:
+        pollnum = int(poll.read())
+    formatted_pollnum = str(pollnum).zfill(5)
 
     embed = discord.Embed(title=title, description="選項", color=0x00ff00)
     embed.add_field(name="選項A", value=option_a, inline=False)
     embed.add_field(name="選項B", value=option_b, inline=False)
+    option[formatted_pollnum] = {"question": title,"option_a": option_a ,"option_b" : option_b}
+    with open('option.json', 'w', encoding='UTF-8') as f:
+        json.dump(option, f, indent=2)
+    
     messagechannel = client.get_channel(1091377309753282732)# 限定的頻道 ID
     message = await messagechannel.send(embed=embed)
     await message.add_reaction("\U0001F1E6")
@@ -413,9 +423,9 @@ async def createpoll_command(interaction,result:app_commands.Choice[str]):
         option = json.load(file)
     with open('point.json', 'r', encoding='UTF-8') as file:
         points = json.load(file)
-    if option_list == []:
-        await interaction.response.send_message("找不到題目，請重新輸入")
-        return
+    with open('pollnum.txt', "r") as poll:
+        pollnum = int(poll.read())
+    formatted_pollnum = str(pollnum).zfill(5)
     if ans == "選項A":
         for user_id, info in option["option_A"]["betting"].items():
             betting = info["betting"]
@@ -427,14 +437,14 @@ async def createpoll_command(interaction,result:app_commands.Choice[str]):
             with open('point.json', 'r', encoding='UTF-8') as file:
                 points = json.load(file)
             user_points = points[user_id]['points']
-            await user.send(f'恭喜你獲得{int(betting * magnification)}點，目前社畜幣為{user_points}')
-            logger.info(f'{user.nick} 在{question}，選擇A選項:{option_list[0]}，成功獲得{int(betting * magnification)}點社畜幣')
+            await user.send(f'恭喜你在{option[formatted_pollnum]["question"]}中，獲得{int(betting * magnification)}點，目前社畜幣為{user_points}')
+            logger.info(f'{user.name} 在{option[formatted_pollnum]["question"]}，選擇A選項:{option[formatted_pollnum]["option_a"]}，成功獲得{int(betting * magnification)}點社畜幣')
         for user_id, info in option["option_B"]["betting"].items():
             betting = info["betting"]
             user = await client.fetch_user(user_id)
-            await user.send(f'很遺憾你在本次投票中失敗，損失{int(betting)}點社畜幣')
-            logger.info(f'{user.nick} 在{question}，選擇B選項:{option_list[1]}，損失{int(betting)}點社畜幣')
-        await interaction.response.send_message(f"恭喜選項A {option_list[0]} 獲勝")
+            await user.send(f'很遺憾你在{option[formatted_pollnum]["question"]}中失敗，損失{int(betting)}點社畜幣')
+            logger.info(f'{user.name} 在{{option[formatted_pollnum]["question"]}}，選擇B選項:{option[formatted_pollnum]["option_b"]}，損失{int(betting)}點社畜幣')
+        await interaction.response.send_message(f"恭喜選項A {option[formatted_pollnum]['option_a']} 獲勝")
         selected_options={}
         option["option_A"]["total"] = 0
         option["option_A"]["magnification"] = 0.0
@@ -445,7 +455,12 @@ async def createpoll_command(interaction,result:app_commands.Choice[str]):
         option["option_B"]["magnification"] = 0.0
         option["option_B"]["people"] = 0
         option["option_B"]["betting"] ={}
+        del option[formatted_pollnum]
         
+        new_pollnum = pollnum + 1
+        formatted_pollnum = str(new_pollnum).zfill(5)
+        with open('pollnum.txt', 'w') as pollnum1:
+            pollnum1.write(formatted_pollnum)
         with open('option.json', 'w', encoding='UTF-8') as f:
             json.dump(option, f, indent=2)
         update = False
@@ -464,14 +479,14 @@ async def createpoll_command(interaction,result:app_commands.Choice[str]):
             with open('point.json', 'r', encoding='UTF-8') as file:
                 points = json.load(file)
             user_points = points[user_id]['points']
-            await user.send(f'恭喜你獲得{int(betting * magnification)}點，目前社畜幣為{user_points}')
-            logger.info(f'{user.nick} 在{question}，選擇B選項:{option_list[1]}，成功獲得{int(betting * magnification)}點社畜幣')
+            await user.send(f'恭喜你在{option[formatted_pollnum]["question"]}中，獲得{int(betting * magnification)}點，目前社畜幣為{user_points}')
+            logger.info(f'{user.name} 在{option[formatted_pollnum]["question"]}，選擇B選項:{option[formatted_pollnum]["option_b"]}，成功獲得{int(betting * magnification)}點社畜幣')
         for user_id, info in option["option_A"]["betting"].items():
             betting = info["betting"]
             user = await client.fetch_user(user_id)
-            await user.send(f'很遺憾你在本次投票中失敗，損失{int(betting)}點社畜幣')
-            logger.info(f'{user.nick} 在{question}，選擇A選項:{option_list[0]}，損失{int(betting)}點社畜幣')
-        await interaction.response.send_message(f"恭喜選項B {option_list[1]} 獲勝")
+            await user.send(f'很遺憾你在{option[formatted_pollnum]["question"]}中失敗，損失{int(betting)}點社畜幣')
+            logger.info(f'{user.name} 在{option[formatted_pollnum]["question"]}，選擇A選項:{option[formatted_pollnum]["option_a"]}，損失{int(betting)}點社畜幣')
+        await interaction.response.send_message(f"恭喜選項B {option[formatted_pollnum]['option_b']} 獲勝")
         selected_options={}
         option["option_A"]["total"] = 0
         option["option_A"]["magnification"] = 0.0
@@ -482,6 +497,12 @@ async def createpoll_command(interaction,result:app_commands.Choice[str]):
         option["option_B"]["magnification"] = 0.0
         option["option_B"]["people"] = 0
         option["option_B"]["betting"] ={}
+        del option[formatted_pollnum]
+        
+        new_pollnum = pollnum + 1
+        formatted_pollnum = str(new_pollnum).zfill(5)
+        with open('pollnum.txt', 'w') as pollnum1:
+            pollnum1.write(formatted_pollnum)
         
         with open('option.json', 'w', encoding='UTF-8') as f:
             json.dump(option, f, indent=2)
@@ -1079,6 +1100,11 @@ async def on_reaction_add(reaction, user):
 
     with open('point.json', 'r', encoding='UTF-8') as file:
         points = json.load(file)
+    with open('option.json', 'r', encoding='UTF-8') as file:
+        option = json.load(file)
+    with open('pollnum.txt', "r") as poll:
+        pollnum = int(poll.read())
+    formatted_pollnum = str(pollnum).zfill(5)
 
     if str(reaction.emoji) == "\U0001F1E6" and bet == True:
         if user.id not in selected_options:
@@ -1086,9 +1112,9 @@ async def on_reaction_add(reaction, user):
             if selected_options[user.id] != "A":
                 selected_options[user.id] = "A"
                 user_points = points[str(user.id)]['points']
-                await user.send(f"{question}，選擇A選項 {option_list[0]}")
+                await user.send(f"{option[formatted_pollnum]['question']}，選擇A選項 {option[formatted_pollnum]['option_a']}")
                 await user.send(f"請輸入下注金額，目前有社畜幣{user_points}點")
-                logger.info(f'{user.nick} 在{question}，選擇A選項:{option_list[0]}')
+                logger.info(f'{user.name} 在{option[formatted_pollnum]["question"]}，選擇A選項:{option[formatted_pollnum]["option_a"]}')
         else:
             await user.send(f"你已經選擇了{selected_options[user.id]}選項，無法選擇A選項")
 
@@ -1098,9 +1124,9 @@ async def on_reaction_add(reaction, user):
             if selected_options[user.id] != "B":
                 selected_options[user.id] = "B"
                 user_points = points[str(user.id)]['points']
-                await user.send(f"{question}，選擇B選項 {option_list[1]}")
+                await user.send(f"{option[formatted_pollnum]['question']}，選擇B選項 {option[formatted_pollnum]['option_b']}")
                 await user.send(f"請輸入下注金額，目前有社畜幣{user_points}點")
-                logger.info(f'{user.nick} 在{question}，選擇B選項:{option_list[1]}')
+                logger.info(f'{user.name} 在{option[formatted_pollnum]["question"]}，選擇B選項:{option[formatted_pollnum]["option_b"]}')
         else:
             await user.send(f"你已經選擇了{selected_options[user.id]}選項，無法選擇B選項")
     if release_id != None:
