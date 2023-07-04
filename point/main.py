@@ -17,6 +17,7 @@ from matplotlib.font_manager import FontProperties
 import requests
 import re
 from discord import AppCommandOptionType, app_commands
+from logging.handlers import TimedRotatingFileHandler
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -32,23 +33,14 @@ font1 = FontProperties(fname=r"NotoSerifTC-Regular.otf", size=14)
 # 设置日志记录器
 logger = logging.getLogger('discord')
 logger.setLevel(logging.INFO)
-handler = logging.FileHandler(filename='discord.log',
-                              encoding='utf-8',
-                              mode='a')
-handler.setFormatter(
-    logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-logging.Formatter.converter = time.localtime
-logger.addHandler(handler)
-
-logger1 = logging.getLogger('discord')
-logger1.setLevel(logging.INFO)
-handler1 = logging.FileHandler(filename='discord.log',
-                              encoding='utf-8',
-                              mode='a')
-handler1.setFormatter(
-    logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-logging.Formatter.converter = time.localtime
-logger1.addHandler(handler1)
+file_handler = TimedRotatingFileHandler(filename='logs/discord.log',
+                                        when='midnight',
+                                        interval=1,
+                                        backupCount=30,
+                                        encoding='utf-8')
+file_formatter = logging.Formatter('%(asctime)s %(levelname)s %(name)s - %(message)s')
+file_handler.setFormatter(file_formatter)
+logger.addHandler(file_handler)
 
 @client.event
 async def on_ready():
