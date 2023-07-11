@@ -610,7 +610,10 @@ async def postbounty_command(interaction,type:app_commands.Choice[str],other:Opt
     global release_id
     global release_name
     release_id = interaction.user.id
-    release_name = interaction.user.nick
+    if interaction.user.nick == None:
+        release_name = interaction.user.name
+    else:
+        release_name = interaction.user.nick
     release_reward = math.ceil(float(type.value)*float(score.value)*float(limit_score.value)*games)
     
     with open('task.json', 'r', encoding='UTF-8') as file:
@@ -658,7 +661,7 @@ async def acceptbounty_command(interaction,title:str):
     word = title
     if word in task:
         if task[word]["receiver"] is None:
-            if task[word]["release"] != user_name:
+            if task[word]["release_id"] != user_id:
                 task[word]["receiver"] = user_name
                 task[word]["receiver_id"] = user_id
                 task[word]["task_time"] = datetime.now().timestamp()
@@ -692,7 +695,10 @@ async def finishbounty_command(interaction,title:str):
     with open('task.json', 'r', encoding='UTF-8') as file:
         task = json.load(file)
     release_words = title
-    release_name = interaction.user.nick
+    if interaction.user.nick == None:
+        release_name = interaction.user.name
+    else:
+        release_name = interaction.user.nick
     release_id = interaction.user.id
     if release_words in task:
         if task[release_words]["release_id"] == interaction.user.id or interaction.user.id == 525348260399939594:
@@ -1407,6 +1413,26 @@ async def send_task_table(channel):
                         json.dump(task, f, indent=2)
             else:
                 task_elapsed = None
+                
+            if taskinfo['start_time'] != None:
+                start_time = datetime.fromtimestamp(taskinfo['start_time'])
+                start_now = datetime.now()
+                start_elapsed_time = start_now - start_time
+                start_elapsed_seconds = start_elapsed_time.total_seconds()
+                if start_elapsed_seconds > 1209600:
+                    await channel.send(
+                        f"<@{release_id}> 懸賞過期取消懸賞:{taskname}，取回報酬{reward}點社畜幣"
+                    )
+                    with open('point.json', 'r', encoding='UTF-8') as file:
+                        points = json.load(file)
+                    points[str(release_id)]["points"] += reward
+                    with open('point.json', 'w', encoding='UTF-8') as f:
+                        json.dump(points, f, indent=2)
+                    del task[tasknum]
+                    with open('task.json', 'w', encoding='UTF-8') as f:
+                        json.dump(task, f, indent=2)
+                    return
+
             table += f"**{b}.**懸賞編號:{tasknum}\n懸賞名稱:{taskname}\t酬勞:{reward}點社畜幣\t發布人:{release}\t接取人:{receiver}\t已使用時間:{task_elapsed}\n---------------\n"
         message = await channel.send(table)
         examine_message_ids.append(message.id)
