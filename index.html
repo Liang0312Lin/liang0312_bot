@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>啟動 Age of Empires</title>
+    <title>啟動 Age of Empires II: Definitive Edition</title>
     <script>
         function getNumberFromURL() {
             const params = new URLSearchParams(window.location.search);
-            return params.get("number");  // 取得 URL 參數 "number"
+            return params.get("number");
         }
 
         function redirect() {
@@ -20,7 +20,6 @@
                     alert("如果沒有自動啟動，請確保已安裝應用程式，或手動點擊下方連結。");
                 }, 3000);
 
-                // 更新頁面上的超連結
                 document.getElementById("aoe-link").href = aoeLink;
                 document.getElementById("aoe-link").textContent = aoeLink;
             } else {
@@ -30,7 +29,7 @@
     </script>
 </head>
 <body onload="redirect()">
-    <h1>正在啟動 Age of Empires...</h1>
-    <p>如果沒有自動啟動，請 <a id="aoe-link" href="#">點擊這裡</a>。</p>
+    <h1>正在啟動 Age of Empires II: Definitive Edition...</h1>
+    <p>如果沒有自動啟動，請點擊這裡 <a id="aoe-link" href="#"></a>。</p>
 </body>
 </html>
